@@ -4,8 +4,11 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -18,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +45,7 @@ fun GamePage(navController: NavController) {
     val remainingClaim = remember { mutableIntStateOf(5) }
     val hint = remember { mutableStateOf("") }
     val isGuessTrue = remember { mutableStateOf(false) }
+    val localFocusManager = LocalFocusManager.current
 
     LaunchedEffect(key1 = true) {
         randomNumber.intValue = Random.nextInt(101)
@@ -48,7 +53,9 @@ fun GamePage(navController: NavController) {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -132,12 +139,14 @@ fun GamePage(navController: NavController) {
                     remainingClaim.intValue -= 1
 
                     if(isGuessTrue.value) {
+                        localFocusManager.clearFocus()
                         navController.navigate("resultPage/true/${randomNumber.intValue}") {
                             popUpTo("gamePage") { inclusive = true }
                         }
                     }
 
                     if(isGuessTrue.value.not() && remainingClaim.intValue == 0) {
+                        localFocusManager.clearFocus()
                         navController.navigate("resultPage/false/${randomNumber.intValue}") {
                             popUpTo("gamePage") { inclusive = true }
                         }
